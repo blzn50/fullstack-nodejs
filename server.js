@@ -4,7 +4,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 
 const shopRoutes = require('./routes/shop');
-const adminData = require('./routes/admin');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(morgan('tiny'));
 
 app.use(shopRoutes);
-app.use('/admin', adminData.adminRouter);
+app.use('/admin', adminRoutes);
 
 app.use((req, res, next) => {
   res.status(404).render('404', { pageTitle: 'Page Not Found', path: '' });

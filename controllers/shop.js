@@ -20,9 +20,22 @@ exports.getProducts = (req, res, next) => {
   });
 };
 
+exports.getProductDetail = (req, res, next) => {
+  const id = req.params.productId;
+  Product.getById(id, (product) => {
+    res.render('shop/product-detail', { pageTitle: product.title, product, path: '/products' });
+  });
+};
+
 exports.getCart = (req, res, next) => {
   res.render('shop/cart', { pageTitle: 'Your Cart', path: '/cart' });
 };
+
+exports.postToCart = (req, res, next) => {
+  const productId = req.body.productId;
+  res.render('shop/cart', { pageTitle: 'Your Cart', path: '/cart' });
+};
+
 exports.getOrders = (req, res, next) => {
   res.render('shop/orders', { pageTitle: 'Your Cart', path: '/orders' });
 };

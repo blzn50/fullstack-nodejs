@@ -58,3 +58,14 @@ exports.postEditProduct = (req, res, next) => {
   updatedProduct.save();
   res.redirect('/admin/products');
 };
+
+exports.deleteProductById = (req, res, next) => {
+  const prodId = req.body.productId;
+  Product.deleteProduct(prodId, (products) => {
+    res.render('admin/products', {
+      pageTitle: 'All Products',
+      path: '/admin/products',
+      prods: products,
+    });
+  });
+};

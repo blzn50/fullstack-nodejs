@@ -50,4 +50,18 @@ module.exports = class Product {
       cb(product);
     });
   }
+
+  static deleteProduct(id, cb) {
+    getAllProductsFromFile((products) => {
+      const updatedProducts = products.filter((prod) => prod.id !== id);
+
+      // update the product list
+      fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
+        // delete product from cart as well
+        if (!err) {
+        }
+      });
+      cb(products);
+    });
+  }
 };

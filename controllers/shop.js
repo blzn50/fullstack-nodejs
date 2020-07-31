@@ -47,8 +47,16 @@ exports.getCart = (req, res, next) => {};
 
 exports.postToCart = (req, res, next) => {
   const productId = req.body.productId;
-
-  res.redirect('/cart');
+  Product.findById(productId)
+    .then((product) => {
+      return req.user.addToCart(product);
+    })
+    .then((result) => {
+      res.redirect('/cart');
+    })
+    .catch((err) => {
+      console.error(err);
+    });
 };
 
 exports.removeItemFromCart = (req, res, next) => {

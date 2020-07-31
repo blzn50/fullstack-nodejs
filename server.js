@@ -2,8 +2,9 @@ const express = require('express');
 const morgan = require('morgan');
 const path = require('path');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
-const pool = require('./utils/db');
+const { mongoURI } = require('./utils/config');
 const shopRoutes = require('./routes/shop');
 const adminRoutes = require('./routes/admin');
 
@@ -24,4 +25,9 @@ app.use((req, res, next) => {
   res.status(404).render('404', { pageTitle: 'Page Not Found', path: '' });
 });
 
-app.listen(3000, () => 'Server running in port 3000');
+mongoose
+  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    app.listen(3000, () => 'Server running in port 3000');
+  })
+  .catch((err) => console.log('Connection to db failed', err));

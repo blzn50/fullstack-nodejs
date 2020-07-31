@@ -1,29 +1,27 @@
-const db = require('../utils/db');
-const Cart = require('./cart');
+const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
 
-module.exports = class Product {
-  constructor(id, title, imageUrl, description, price) {
-    this.id = id;
-    this.title = title;
-    this.imageUrl = imageUrl;
-    this.description = description;
-    this.price = price;
-  }
+mongoose.set('useCreateIndex', true);
 
-  save() {
-    return db.query(
-      'INSERT INTO products (title, description, "imageUrl", price) VALUES ($1,$2, $3, $4)',
-      [this.title, this.description, this.imageUrl, this.price]
-    );
-  }
+const productSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    minlength: 2,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  description: {
+    type: String,
+  },
+  imageUrl: {
+    type: String,
+    required: true,
+  },
+});
 
-  static fetchAll() {
-    return db.query('SELECT * FROM products', '');
-  }
+productSchema.plugin(uniqueValidator);
 
-  static getById(id) {
-    return db.query('SELECT * FROM products WHERE id = $1', [id]);
-  }
-
-  static deleteProduct(id) {}
-};
+module.exports = mongoose.model('Product', productSchema);

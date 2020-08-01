@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
-const product = require('./product');
 
 const { Schema } = mongoose;
 const userSchema = new Schema({
@@ -62,5 +61,7 @@ userSchema.methods.clearCart = function () {
   this.cart = { items: [] };
   return this.save();
 };
+
+userSchema.plugin(uniqueValidator);
 
 module.exports = mongoose.model('User', userSchema);

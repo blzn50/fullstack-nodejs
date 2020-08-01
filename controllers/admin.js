@@ -22,7 +22,6 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.getEditProduct = (req, res, next) => {
   const editMode = req.query.edit;
-  console.log('editMode: ', editMode);
   if (!editMode) {
     return res.redirect('/');
   }
@@ -47,7 +46,7 @@ exports.postAddProduct = (req, res, next) => {
   const { description } = req.body;
   const { price } = req.body;
 
-  const product = new Product({ title, imageUrl, description, price, userId: req.session.user });
+  const product = new Product({ title, imageUrl, description, price, userId: req.user });
 
   product
     .save()

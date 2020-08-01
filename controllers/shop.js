@@ -86,7 +86,11 @@ exports.removeItemFromCart = (req, res, next) => {
 };
 
 exports.getOrders = (req, res, next) => {
-  res.render('shop/orders', { pageTitle: 'Your Cart', path: '/orders' });
+  Order.find({ 'user.userId': req.user._id })
+    .then((orders) => {
+      res.render('shop/orders', { pageTitle: 'Your Orders', path: '/orders', orders: orders });
+    })
+    .catch((err) => console.log(err));
 };
 
 exports.postCreateOrders = (req, res, next) => {

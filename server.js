@@ -8,6 +8,7 @@ const { mongoURI } = require('./utils/config');
 const User = require('./models/user');
 const shopRoutes = require('./routes/shop');
 const adminRoutes = require('./routes/admin');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 
@@ -28,8 +29,9 @@ app.use((req, res, next) => {
     .catch((err) => console.error(err));
 });
 
-app.use(shopRoutes);
 app.use('/admin', adminRoutes);
+app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use((req, res, next) => {
   res.status(404).render('404', { pageTitle: 'Page Not Found', path: '' });

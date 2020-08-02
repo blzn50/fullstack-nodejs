@@ -31,6 +31,9 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: store,
+    cookie: {
+      // maxAge: 1000*60*10 // 10 minutes
+    },
   })
 );
 

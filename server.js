@@ -57,12 +57,6 @@ app.use((req, res, next) => {
 mongoose
   .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
-    User.findOne().then((user) => {
-      if (!user) {
-        const user = new User({ name: 'Naren', email: 'naren@example.com', cart: { items: [] } });
-        user.save();
-      }
-    });
     app.listen(3000, () => 'Server running in port 3000');
   })
   .catch((err) => console.log('Connection to db failed', err));

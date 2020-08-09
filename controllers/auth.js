@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const sgMail = require('@sendgrid/mail');
 const User = require('../models/user');
@@ -102,5 +103,52 @@ exports.postLogout = (req, res, next) => {
   req.session.destroy((err) => {
     console.error(err);
     res.redirect('/');
+  });
+};
+
+exports.getReset = (req, res, next) => {
+  let message = req.flash('error');
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
+  res.render('auth/reset', {
+    path: '/reset',
+    pageTitle: 'Reset Password',
+    errorMessage: message,
+  });
+};
+
+exports.postReset = (req, res, next) => {
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) {
+      console.log(err);
+      return res.redirect('/reset');
+    }
+    const token = buffer.toString('hex');
+    User.findOne({ email: req.body.email })
+      .then((user) => {
+        if (!user) {
+          req.flash('error', 'Cannot find account with that email!');
+          return res.redirect('/reset');
+        }
+        user.resetToken = token;
+        user.resetTokenExpiration = Date.now() + 3600000;
+        return user.save();
+      })
+      .then((result) => {
+        res.redirect('/');
+        sgMail.send({
+          to: req.body.email,
+          from: 'no-reply@e-shop.com',
+          subject: 'Reset Password',
+          html: `<p>You have requested to reset password to your email.</p> 
+            <p>If this is requested by you then please follow this <a href="http://localhost:3000/reset/${token}">link</a> to set a new password otherwise ignore this email.</p>`,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   });
 };

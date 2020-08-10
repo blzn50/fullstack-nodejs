@@ -7,6 +7,8 @@ const {
   postSignup,
   getReset,
   postReset,
+  getNewPassword,
+  postNewPassword,
 } = require('../controllers/auth');
 
 const authRouter = express.Router();
@@ -19,6 +21,9 @@ authRouter.post('/signup', postSignup);
 
 authRouter.get('/reset', getReset);
 authRouter.post('/reset', postReset);
+
+authRouter.get('/reset/:token', getNewPassword);
+authRouter.post('/new-password', postNewPassword);
 
 authRouter.post('/logout', postLogout);
 

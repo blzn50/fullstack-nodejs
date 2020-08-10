@@ -19,10 +19,11 @@ authRouter.get('/login', getLogin);
 authRouter.post(
   '/login',
   [
-    body('email').isEmail().withMessage('Please input a valid email.'),
+    body('email').isEmail().withMessage('Please input a valid email.').normalizeEmail(),
     body('password')
       .isLength({ min: 5 })
-      .withMessage('Password must be at least 5 characters long.'),
+      .withMessage('Password must be at least 5 characters long.')
+      .trim(),
   ],
   postLogin
 );
@@ -40,16 +41,20 @@ authRouter.post(
             return Promise.reject('Email already exists. Please pick a new one.');
           }
         });
-      }),
+      })
+      .normalizeEmail(),
     body('password')
       .isLength({ min: 5 })
-      .withMessage('Password must be at least 5 characters long.'),
-    body('confirmPassword').custom((value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error("Password doesn't match");
-      }
-      return true;
-    }),
+      .withMessage('Password must be at least 5 characters long.')
+      .trim(),
+    body('confirmPassword')
+      .trim()
+      .custom((value, { req }) => {
+        if (value !== req.body.password) {
+          throw new Error("Password doesn't match");
+        }
+        return true;
+      }),
   ],
   postSignup
 );

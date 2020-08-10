@@ -18,7 +18,12 @@ const authRouter = express.Router();
 authRouter.get('/login', getLogin);
 authRouter.post(
   '/login',
-  [body('email').isEmail(), body('password').isLength({ min: 5 })],
+  [
+    body('email').isEmail().withMessage('Please input a valid email.'),
+    body('password')
+      .isLength({ min: 5 })
+      .withMessage('Password must be at least 5 characters long.'),
+  ],
   postLogin
 );
 

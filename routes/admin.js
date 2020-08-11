@@ -25,7 +25,6 @@ adminRouter.post(
       .isString()
       .isLength({ min: 3 })
       .withMessage('Title must be at least 3 characters long.'),
-    body('imageUrl').isURL().withMessage('Url must be valid.'),
     body('description')
       .trim()
       .isLength({ min: 5, max: 200 })

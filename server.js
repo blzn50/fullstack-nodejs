@@ -98,6 +98,14 @@ app.use((req, res, next) => {
   res.status(404).render('404', { pageTitle: 'Page Not Found', path: '' });
 });
 
+app.use((err, req, res, next) => {
+  if (err) {
+    res.render('500', {
+      pageTitle: 'Internal Error',
+      path: '',
+    });
+  }
+});
 mongoose
   .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {

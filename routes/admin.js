@@ -53,6 +53,6 @@ adminRouter.post(
   postEditProduct
 );
 
-adminRouter.post('/delete-product', isAuth, deleteProductById);
+adminRouter.delete('/product/:productId', isAuth, deleteProductById);
 
 module.exports = adminRouter;

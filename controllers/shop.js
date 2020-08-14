@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 const PDFDocument = require('pdfkit');
 const Product = require('../models/product');
 const Order = require('../models/order');
@@ -122,6 +123,72 @@ exports.removeItemFromCart = (req, res, next) => {
     .catch((err) => next(err));
 };
 
+exports.getCheckout = (req, res, next) => {
+  req.user
+    .populate('cart.items.productId')
+    .execPopulate()
+    .then((user) => {
+      const products = user.cart.items;
+      let totalSum = 0;
+      products.forEach((p) => {
+        totalSum += p.quantity * p.productId.price;
+      });
+      res.render('shop/checkout', {
+        path: '/checkout',
+        pageTitle: 'Checkout Page',
+        products,
+        totalSum,
+      });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postCreateOrders = (req, res, next) => {
+  const token = req.body.stripeToken;
+  console.log('token: ', token);
+  let totalSum = 0;
+
+  req.user
+    .populate('cart.items.productId')
+    .execPopulate()
+    .then((user) => {
+      const products = user.cart.items.map((i) => {
+        totalSum += i.quantity * i.productId.price;
+        return {
+          quantity: i.quantity,
+          product: { ...i.productId._doc },
+        };
+      });
+
+      const order = new Order({
+        user: {
+          userId: req.user,
+          email: req.user.email,
+        },
+        products,
+      });
+      return order.save();
+    })
+    .then((result) => {
+      // const charge = stripe.charges.create({
+      //   amount: totalSum,
+      //   currency: 'usd',
+      //   description: 'Charge for products bought',
+      //   source: token,
+      //   metadata: { order_id: result._id.toString() },
+      // });
+      return req.user.clearCart();
+    })
+    .then(() => {
+      res.redirect('/orders');
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
 exports.getOrders = (req, res, next) => {
   Order.find({ 'user.userId': req.user._id })
     .then((orders) => {
@@ -132,37 +199,6 @@ exports.getOrders = (req, res, next) => {
       });
     })
     .catch((err) => next(err));
-};
-
-exports.postCreateOrders = (req, res, next) => {
-  req.user
-    .populate('cart.items.productId')
-    .execPopulate()
-    .then((user) => {
-      const products = user.cart.items.map((i) => {
-        return {
-          quantity: i.quantity,
-          product: { ...i.productId._doc },
-        };
-      });
-      const order = new Order({
-        user: {
-          userId: req.user,
-          email: req.user.email,
-        },
-        products,
-      });
-      return order.save();
-    })
-    .then(() => {
-      return req.user.clearCart();
-    })
-    .then(() => {
-      res.redirect('/orders');
-    })
-    .catch((err) => {
-      next(err);
-    });
 };
 
 exports.getInvoice = (req, res, next) => {

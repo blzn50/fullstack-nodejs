@@ -15,6 +15,8 @@ const User = require('./models/user');
 const shopRoutes = require('./routes/shop');
 const adminRoutes = require('./routes/admin');
 const authRoutes = require('./routes/auth');
+const { postCreateOrders } = require('./controllers/shop');
+const isAuth = require('./middlewares/is-auth');
 
 const app = express();
 const store = new MongoSessionStore({
@@ -64,7 +66,6 @@ app.use(
     },
   })
 );
-app.use(csrfProtection);
 app.use(flash());
 
 app.use((req, res, next) => {
@@ -86,6 +87,13 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
   res.locals.isAuthenticated = req.session.isLoggedIn;
+  next();
+});
+
+app.post('/create-order', isAuth, postCreateOrders);
+
+app.use(csrfProtection);
+app.use((req, res, next) => {
   res.locals.csrfToken = req.csrfToken();
   next();
 });
